@@ -23,6 +23,7 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
+int get_uncle_count(int);
 
 // new system calls
 int find_digital_root(void);

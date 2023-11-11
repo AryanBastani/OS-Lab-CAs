@@ -1,0 +1,7 @@
+make --dry-run --keep-going --print-directory
+make: Entering directory '/home/aryan/Desktop/main/OS-Lab2'
+ 
+make: 'xv6.img' is up to date.
+ 
+make: Leaving directory '/home/aryan/Desktop/main/OS-Lab2'
+ 

@@ -24,6 +24,9 @@ extern int ncpu;
 // The layout of the context matches the layout of the stack in swtch.S
 // at the "Switch stacks" comment. Switch doesn't save eip explicitly,
 // but it is on the stack and allocproc() manipulates it.
+
+int get_uncle_count(int pid);
+
 struct context {
   uint edi;
   uint esi;
@@ -49,6 +52,7 @@ struct proc {
   struct file *ofile[NOFILE];  // Open files
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
+  int uncle_count;
 };
 
 // Process memory is laid out contiguously, low addresses first:

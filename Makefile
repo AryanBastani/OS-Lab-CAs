@@ -184,6 +184,7 @@ UPROGS=\
 	_zombie\
 	_get_pid\
 	_test_root\
+	_get_uncles_count\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)
