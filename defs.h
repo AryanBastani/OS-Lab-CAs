@@ -33,8 +33,8 @@ void            fileinit(void);
 int             fileread(struct file*, char*, int n);
 int             filestat(struct file*, struct stat*);
 int             filewrite(struct file*, char*, int n);
-int check_exists(char* file);
-int is_valid_file(char* file);
+int             check_exists(char* file);
+int             is_valid_file(char* file);
 
 // fs.c
 void            readsb(int dev, struct superblock *sb);
@@ -122,6 +122,8 @@ void            userinit(void);
 int             wait(void);
 void            wakeup(void*);
 void            yield(void);
+int             get_uncle_count(int pid);
+int             get_process_lifetime(int pid);
 
 // swtch.S
 void            swtch(struct context**, struct context*);
