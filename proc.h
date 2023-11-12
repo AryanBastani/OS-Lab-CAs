@@ -26,6 +26,7 @@ extern int ncpu;
 // but it is on the stack and allocproc() manipulates it.
 
 int get_uncle_count(int pid);
+int get_process_lifetime(int pid);
 
 struct context {
   uint edi;

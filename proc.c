@@ -559,11 +559,8 @@ int get_uncle_count(int pid) {
   return -1; // If PID not found
 }
 
-int sys_get_process_lifetime(void) {
-  int pid;
+int get_process_lifetime(int pid) {
   struct proc *p;
-  if(argint(0, &pid) < 0)
-    return -1;
 
   acquire(&ptable.lock);
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
