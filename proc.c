@@ -215,16 +215,7 @@ fork(void)
   acquire(&ptable.lock);
 
   np->state = RUNNABLE;
-
-   // Count the number of siblings of the parent process
-  int uncle_count = 0;
-  struct proc *p;
-  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
-    if(p->parent == curproc->parent && p != curproc) {
-      uncle_count++;
-    }
-  }
-  np->uncle_count = uncle_count;
+  
   np->creation_time = ticks;
 
   release(&ptable.lock);
@@ -545,14 +536,22 @@ procdump(void)
 }
 
 int get_uncle_count(int pid) {
-  struct proc *p;
+  struct proc *curr_p;
   acquire(&ptable.lock);
 
-  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-    if(p->pid == pid){
+  for(curr_p = ptable.proc; curr_p < &ptable.proc[NPROC]; curr_p++){
+    if(curr_p->pid == pid){
+
+      int uncle_count = 0;
+      struct proc *p;
+      for(p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
+        if(p->parent == (curr_p->parent)->parent && p != (curr_p->parent)) {
+          uncle_count++;
+        }
+      }
     
       release(&ptable.lock);
-      return p->uncle_count;
+      return uncle_count;
     }
   }
 
