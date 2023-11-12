@@ -449,5 +449,53 @@ sys_copy_file(void)
   char *src, *dst;
   if(argstr(0, &src) < 0 || argstr(1, &dst) < 0)
     return(-1);
-  return(copy_file(src, dst));
+  if(!is_valid_file(src) || check_exists(dst))
+    return(-1);
+
+  struct file *src_file, *dst_file;
+  begin_op();
+  src_file = filealloc();
+  dst_file = filealloc();
+
+  src_file->ip = namei(src);
+  src_file->type = FD_INODE;
+  src_file->off = 0;
+  src_file->readable = 1;
+  src_file->writable = 0;
+
+  dst_file->ip =  create(dst, T_FILE, 0, 0);
+  iunlock(dst_file->ip);
+  dst_file->type = FD_INODE;
+  dst_file->off = 0;
+  dst_file->readable = 1;
+  dst_file->writable = 1;  
+  
+
+  char* buf = kalloc();
+  memset(buf, 0, BSIZE);
+  int n;
+  while ((n = fileread(src_file, buf, sizeof(buf))) > 0) 
+  {
+    if (filewrite(dst_file, buf, n) != n) 
+    {
+        cprintf("copy_file: error in filewrite\n");
+        fileclose(src_file);
+        fileclose(dst_file);
+        end_op();
+        return -1;
+    }
+  }
+  if (n < 0) 
+  {
+    cprintf("copy_file: error in fileread\n");
+    fileclose(src_file);
+    fileclose(dst_file);
+    end_op();
+    return -1;
+  }
+
+  fileclose(src_file);
+  fileclose(dst_file);
+  end_op();
+  return(0);
 }

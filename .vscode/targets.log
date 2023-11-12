@@ -8,7 +8,7 @@ make: *** No rule to make target 'all'.  Stop.
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Sun Nov 12 13:23:20 2023
+# Make data base, printed on Sun Nov 12 20:32:47 2023
 
 # Variables
 
@@ -22,13 +22,13 @@ LC_ALL = C
 GNOME_SHELL_SESSION_MODE = ubuntu
 # environment
 SSH_AGENT_LAUNCHER = gnome-keyring
-# makefile (from 'Makefile', line 221)
+# makefile (from 'Makefile', line 222)
 QEMUGDB = $(shell if $(QEMU) -help | grep -q '^-gdb'; then echo "-gdb tcp::$(GDBPORT)"; else echo "-s -p $(GDBPORT)"; fi)
 # makefile (from 'Makefile', line 147)
 ULIB = ulib.o usys.o printf.o umalloc.o
 # environment
 SNAP_LAUNCHER_ARCH_TRIPLET = x86_64-linux-gnu
-# makefile (from 'Makefile', line 219)
+# makefile (from 'Makefile', line 220)
 GDBPORT = $(shell expr `id -u` % 5000 + 25000)
 # environment
 LC_NAME = az_IR
@@ -88,6 +88,8 @@ CURDIR := /home/aryan/Desktop/main/OS-Lab2
 APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = 1
 # environment
 LESSOPEN = | /usr/bin/lesspipe %s
+# environment
+VSCODE_L10N_BUNDLE_LOCATION = 
 # automatic
 *D = $(patsubst %/,%,$(dir $*))
 # environment
@@ -138,7 +140,7 @@ OBJS = bio.o console.o exec.o file.o fs.o ide.o ioapic.o kalloc.o kbd.o lapic.o 
 GTK_PATH = /snap/code/146/usr/lib/x86_64-linux-gnu/gtk-3.0
 # environment
 GNOME_DESKTOP_SESSION_ID = this-is-deprecated
-# makefile (from 'Makefile', line 204)
+# makefile (from 'Makefile', line 205)
 PRINT = runoff.list runoff.spec README toc.hdr toc.ftr $(FILES)
 # makefile
 SHELL = /bin/sh
@@ -150,7 +152,6 @@ XMODIFIERS = @im=ibus
 SHLVL = 1
 # environment
 GNOME_TERMINAL_SCREEN = /org/gnome/Terminal/screen/1d858665_fd3b_4025_9d8b_62763bb1b1e4
- 
 # environment
 MAKELEVEL := 0
 # makefile (from 'Makefile', line 79)
@@ -158,7 +159,7 @@ OBJDUMP = $(TOOLPREFIX)objdump
 # default
 MAKE = $(MAKE_COMMAND)
 # makefile (from 'Makefile', line 169)
-UPROGS = _cat _echo _forktest _grep _init _kill _ln _ls _mkdir _rm _sh _stressfs _usertests _wc _zombie _get_pid _test_root _get_uncles_count _process_lifetime 
+UPROGS = _cat _echo _forktest _grep _init _kill _ln _ls _mkdir _rm _sh _stressfs _usertests _wc _zombie _get_pid _test_root _get_uncles_count _process_lifetime _copy_file 
 # environment
 SNAP_COOKIE = C9S-b-9mzxLMdmKHPl24AcX5Iug3E_l1rQFd7LVpmI_PhMxUi6HW
 # environment
@@ -181,7 +182,7 @@ SNAP_REVISION = 146
 SNAP_REAL_HOME = /home/aryan
 # environment
 USERNAME = aryan
-# makefile (from 'Makefile', line 203)
+# makefile (from 'Makefile', line 204)
 FILES = $(shell grep -v '^\#' runoff.list)
 # environment
 GNOME_SETUP_DISPLAY = :1
@@ -233,8 +234,8 @@ MAKE_VERSION := 4.3
 SNAP_DATA = /var/snap/code/146
 # environment
 SNAP_CONTEXT = C9S-b-9mzxLMdmKHPl24AcX5Iug3E_l1rQFd7LVpmI_PhMxUi6HW
-# makefile (from 'Makefile', line 255)
-EXTRA = mkfs.c ulib.c user.h cat.c echo.c forktest.c grep.c kill.c ln.c ls.c mkdir.c rm.c stressfs.c usertests.c wc.c zombie.c get_pid.c printf.c umalloc.c\ test_root.c README dot-bochsrc *.pl toc.* runoff runoff1 runoff.list .gdbinit.tmpl gdbutil 
+# makefile (from 'Makefile', line 256)
+EXTRA = mkfs.c ulib.c user.h cat.c echo.c forktest.c grep.c kill.c ln.c ls.c mkdir.c rm.c stressfs.c usertests.c wc.c zombie.c printf.c umalloc.c\ test_root.c README dot-bochsrc *.pl toc.* runoff runoff1 runoff.list .gdbinit.tmpl gdbutil 
 # makefile (from 'Makefile', line 84)
 LDFLAGS = -m $(shell $(LD) -V | grep elf_i386 2>/dev/null | head -n 1)
 # environment
@@ -255,7 +256,7 @@ XDG_CONFIG_DIRS_VSCODE_SNAP_ORIG = /etc/xdg/xdg-ubuntu:/etc/xdg
 GDK_PIXBUF_MODULE_FILE = /home/aryan/snap/code/common/.cache/gdk-pixbuf-loaders.cache
 # environment
 GIO_MODULE_DIR = /home/aryan/snap/code/common/.cache/gio-modules
-# makefile (from 'Makefile', line 225)
+# makefile (from 'Makefile', line 226)
 CPUS := 2
 # environment
 XDG_SESSION_CLASS = user
@@ -274,6 +275,7 @@ VSCODE_IPC_HOOK = /run/user/1000/vscode-8ac28cea-1.84-main.sock
 # environment
 TERM = xterm-256color
 # environment
+ 
 GTK_EXE_PREFIX = /snap/code/146/usr
 # environment
 SNAP_NAME = code
@@ -301,7 +303,7 @@ VTE_VERSION = 6800
 SNAP_COMMON = /var/snap/code/common
 # default
 .FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell nocomment grouped-target extra-prereqs archives jobserver output-sync check-symlink load
-# makefile (from 'Makefile', line 227)
+# makefile (from 'Makefile', line 228)
 QEMUOPTS = -drive file=fs.img,index=1,media=disk,format=raw -drive file=xv6.img,index=0,media=disk,format=raw -smp $(CPUS) -m 512 $(QEMUEXTRA)
 # makefile (from 'Makefile', line 75)
 CC = $(TOOLPREFIX)gcc
@@ -318,7 +320,7 @@ LC_IDENTIFICATION = az_IR
 # environment
 SNAP_LIBRARY_PATH = /var/lib/snapd/lib/gl:/var/lib/snapd/lib/gl32:/var/lib/snapd/void
 # variable set hash-table stats:
-# Load=152/1024=15%, Rehash=0, Collisions=14/218=6%
+# Load=153/1024=15%, Rehash=0, Collisions=15/219=7%
 
 # Pattern-specific Variable Values
 
@@ -326,9 +328,9 @@ SNAP_LIBRARY_PATH = /var/lib/snapd/lib/gl:/var/lib/snapd/lib/gl32:/var/lib/snapd
 
 # Directories
 
-# . (device 2051, inode 493022): 106 files, no impossibilities.
+# . (device 2051, inode 493022): 109 files, no impossibilities.
 
-# 106 files, no impossibilities in 1 directories.
+# 109 files, no impossibilities in 1 directories.
 
 # Implicit Rules
 
@@ -352,7 +354,7 @@ dist:
 #  Implicit rule search has not been done.
 #  File does not exist.
 #  File has not been updated.
-#  recipe to execute (from 'Makefile', line 263):
+#  recipe to execute (from 'Makefile', line 264):
 	rm -rf dist
 	mkdir dist
 	for i in $(FILES); \
@@ -428,8 +430,7 @@ qemu-memfs: xv6memfs.img
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
- 
-#  recipe to execute (from 'Makefile', line 233):
+#  recipe to execute (from 'Makefile', line 234):
 	$(QEMU) -drive file=xv6memfs.img,index=0,media=disk,format=raw -smp $(CPUS) -m 256
 
 # Not a target:
@@ -542,7 +543,7 @@ tar:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'Makefile', line 286):
+#  recipe to execute (from 'Makefile', line 287):
 	rm -rf /tmp/xv6
 	mkdir -p /tmp/xv6
 	cp dist/* dist/.gdbinit.tmpl /tmp/xv6
@@ -551,6 +552,7 @@ tar:
 .PRECIOUS: %.o
 #  Implicit rule search has not been done.
 #  Modification time never checked.
+ 
 #  File has not been updated.
 
 # Not a target:
@@ -574,7 +576,7 @@ syscall.c:
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  Last modified 2023-11-12 13:22:53.348943208
+#  Last modified 2023-11-12 20:32:44.523972026
 #  File has been updated.
 #  Successfully updated.
 
@@ -588,7 +590,7 @@ bochs: fs.img xv6.img
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'Makefile', line 215):
+#  recipe to execute (from 'Makefile', line 216):
 	if [ ! -e .bochsrc ]; then ln -s dot-bochsrc .bochsrc; fi
 	bochs -q
 
@@ -604,11 +606,11 @@ _get_uncles_count:
 #  Modification time never checked.
 #  File has not been updated.
 
-fs.img: mkfs README _cat _echo _forktest _grep _init _kill _ln _ls _mkdir _rm _sh _stressfs _usertests _wc _zombie _get_pid _test_root _get_uncles_count _process_lifetime
+fs.img: mkfs README _cat _echo _forktest _grep _init _kill _ln _ls _mkdir _rm _sh _stressfs _usertests _wc _zombie _get_pid _test_root _get_uncles_count _process_lifetime _copy_file
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'Makefile', line 191):
+#  recipe to execute (from 'Makefile', line 192):
 	./mkfs fs.img README $(UPROGS)
 
 print: xv6.pdf
@@ -626,7 +628,7 @@ qemu-nox-gdb: fs.img xv6.img .gdbinit
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'Makefile', line 246):
+#  recipe to execute (from 'Makefile', line 247):
 	@echo "*** Now run 'gdb'." 1>&2
 	$(QEMU) -nographic $(QEMUOPTS) -S $(QEMUGDB)
 
@@ -640,7 +642,7 @@ clean:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'Makefile', line 196):
+#  recipe to execute (from 'Makefile', line 197):
 	rm -f *.tex *.dvi *.idx *.aux *.log *.ind *.ilg \
 	*.o *.d *.asm *.sym vectors.S bootblock entryother \
 	initcode initcode.out kernel xv6.img fs.img kernelmemfs \
@@ -709,7 +711,6 @@ kbd.o:
 
 # Not a target:
 sleeplock.c:
- 
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
@@ -836,6 +837,7 @@ exec.c:
 
 # Not a target:
 _cat:
+ 
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
@@ -986,7 +988,6 @@ main.o:
 #  File has not been updated.
 
 # Not a target:
- 
 entry.S:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
@@ -1032,7 +1033,7 @@ qemu: fs.img xv6.img
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'Makefile', line 230):
+#  recipe to execute (from 'Makefile', line 231):
 	$(QEMU) -serial mon:stdio $(QEMUOPTS)
 
 vectors.S: vectors.pl
@@ -1058,6 +1059,12 @@ initcode: initcode.S
 	$(LD) $(LDFLAGS) -N -e start -Ttext 0 -o initcode.out initcode.o
 	$(OBJCOPY) -S -O binary initcode.out initcode
 	$(OBJDUMP) -S initcode.o > initcode.asm
+
+# Not a target:
+_copy_file:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
 
 # Not a target:
 fcntl.h:
@@ -1117,7 +1124,7 @@ qemu-gdb: fs.img xv6.img .gdbinit
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'Makefile', line 242):
+#  recipe to execute (from 'Makefile', line 243):
 	@echo "*** Now run 'gdb'." 1>&2
 	$(QEMU) -serial mon:stdio $(QEMUOPTS) -S $(QEMUGDB)
 
@@ -1125,7 +1132,7 @@ qemu-nox: fs.img xv6.img
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'Makefile', line 236):
+#  recipe to execute (from 'Makefile', line 237):
 	$(QEMU) -nographic $(QEMUOPTS)
 
 # Not a target:
@@ -1151,7 +1158,8 @@ dist-test:
 #  Implicit rule search has not been done.
 #  File does not exist.
 #  File has not been updated.
-#  recipe to execute (from 'Makefile', line 274):
+#  recipe to execute (from 'Makefile', line 275):
+ 
 	rm -rf dist
 	make dist
 	rm -rf dist-test
@@ -1238,7 +1246,7 @@ xv6.pdf: runoff.list runoff.spec README toc.hdr toc.ftr types.h param.h memlayou
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'Makefile', line 207):
+#  recipe to execute (from 'Makefile', line 208):
 	./runoff
 	ls -l xv6.pdf
 
@@ -1264,7 +1272,6 @@ xv6.img: bootblock kernel
 	dd if=kernel of=xv6.img seek=1 conv=notrunc
 
 tags: bio.o console.o exec.o file.o fs.o ide.o ioapic.o kalloc.o kbd.o lapic.o log.o main.o mp.o picirq.o pipe.o proc.o sleeplock.o spinlock.o string.o swtch.o syscall.o sysfile.o sysproc.o trapasm.o trap.o uart.o vectors.o vm.o sysothers.o entryother.S _init
- 
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
@@ -1299,7 +1306,7 @@ date.h:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'Makefile', line 239):
+#  recipe to execute (from 'Makefile', line 240):
 	sed "s/localhost:1234/localhost:$(GDBPORT)/" < $^ > $@
 
 # Not a target:
@@ -1321,19 +1328,19 @@ vectors.o:
 #  File has not been updated.
 
 # files hash-table stats:
-# Load=151/1024=15%, Rehash=0, Collisions=34/381=9%
+# Load=152/1024=15%, Rehash=0, Collisions=34/383=9%
 # VPATH Search Paths
 
 # No 'vpath' search paths.
 
 # No general ('VPATH' variable) search path.
 
-# strcache buffers: 1 (0) / strings = 196 / storage = 1590 B / avg = 8 B
-# current buf: size = 8162 B / used = 1590 B / count = 196 / avg = 8 B
+# strcache buffers: 1 (0) / strings = 200 / storage = 1648 B / avg = 8 B
+# current buf: size = 8162 B / used = 1648 B / count = 200 / avg = 8 B
 
-# strcache performance: lookups = 392 / hit rate = 50%
+# strcache performance: lookups = 396 / hit rate = 49%
 # hash-table stats:
-# Load=196/8192=2%, Rehash=0, Collisions=3/392=1%
-# Finished Make data base on Sun Nov 12 13:23:20 2023
+# Load=200/8192=2%, Rehash=0, Collisions=3/396=1%
+# Finished Make data base on Sun Nov 12 20:32:47 2023
 
  

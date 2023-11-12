@@ -182,13 +182,3 @@ int check_exists(char* file)
   return(NOT_FOUND);
 }
 
-int copy_file(char* src, char* dst)
-{
-  if(!is_valid_file(src) || check_exists(dst))
-    return(-1);
-
-
-
-  return(0);
-}
-

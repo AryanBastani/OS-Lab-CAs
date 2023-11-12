@@ -186,6 +186,7 @@ UPROGS=\
 	_test_root\
 	_get_uncles_count\
 	_process_lifetime\
+	_copy_file\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)

@@ -39,6 +39,4 @@ struct devsw {
 
 extern struct devsw devsw[];
 
-int copy_file(char* src, char* dst);
-
 #define CONSOLE 1
