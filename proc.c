@@ -550,6 +550,7 @@ int get_uncle_count(int pid) {
 
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
     if(p->pid == pid){
+    
       release(&ptable.lock);
       return p->uncle_count;
     }

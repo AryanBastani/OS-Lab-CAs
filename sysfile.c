@@ -446,5 +446,8 @@ sys_pipe(void)
 int
 sys_copy_file(void)
 {
-  return(0);
+  char *src, *dst;
+  if(argstr(0, &src) < 0 || argstr(1, &dst) < 0)
+    return(-1);
+  return(copy_file(src, dst));
 }

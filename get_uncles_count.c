@@ -9,7 +9,7 @@ int main(void) {
         pid = fork();
         if (pid == 0) {  // Child process
             grandchild = fork();
-            if (grandchild == 0 && i == 0) {  // Grandchild process
+            if (grandchild == 0 && i == 2) {  // Grandchild process
                 printf(1,"PID:%d->", getpid());
                 printf(1,"%d\n", get_uncle_count(getpid()));
                 exit();

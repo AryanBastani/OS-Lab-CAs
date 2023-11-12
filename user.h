@@ -25,7 +25,7 @@ int sleep(int);
 int uptime(void);
 int get_uncle_count(int);
 int get_process_lifetime(int);
-int copy_file(const char* src, const char* dst);
+int copy_file(char* src, char* dst);
 
 // new system calls
 int find_digital_root(void);

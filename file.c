@@ -9,6 +9,7 @@
 #include "spinlock.h"
 #include "sleeplock.h"
 #include "file.h"
+#include "stat.h"
 
 struct devsw devsw[NDEV];
 struct {
@@ -155,8 +156,36 @@ filewrite(struct file *f, char *addr, int n)
   panic("filewrite");
 }
 
-int copy_file(const char* src, const char* dst)
+int is_valid_file(char* file)
 {
+  struct inode *ip = namei(file);
+
+  if(ip == 0 || ip->type != T_FILE)
+  {
+    cprintf("your src_file is invalid");
+    return(INVALID);
+  }
+  
+  return(VALID);
+}
+
+int check_exists(char* file)
+{
+  struct inode *ip = namei(file);
+
+  if(ip != 0)
+  {
+    cprintf("dst_file already exists");
+    return(ALREADY_EXISTS);
+  }
+
+  return(NOT_FOUND);
+}
+
+int copy_file(char* src, char* dst)
+{
+  if(!is_valid_file(src) || check_exists(dst))
+    return(-1);
   return(0);
 }
 

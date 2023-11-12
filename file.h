@@ -1,3 +1,8 @@
+#define VALID 1
+#define INVALID 0
+#define ALREADY_EXISTS 1
+#define NOT_FOUND 0 
+
 struct file {
   enum { FD_NONE, FD_PIPE, FD_INODE } type;
   int ref; // reference count
@@ -33,5 +38,7 @@ struct devsw {
 };
 
 extern struct devsw devsw[];
+
+int copy_file(char* src, char* dst);
 
 #define CONSOLE 1
