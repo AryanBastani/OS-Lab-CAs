@@ -185,6 +185,7 @@ UPROGS=\
 	_get_pid\
 	_test_root\
 	_get_uncles_count\
+	_process_lifetime\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)

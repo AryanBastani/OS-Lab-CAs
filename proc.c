@@ -225,6 +225,7 @@ fork(void)
     }
   }
   np->uncle_count = uncle_count;
+  np->creation_time = ticks;
 
   release(&ptable.lock);
 
@@ -556,4 +557,21 @@ int get_uncle_count(int pid) {
 
   release(&ptable.lock);
   return -1; // If PID not found
+}
+
+int sys_get_process_lifetime(void) {
+  int pid;
+  struct proc *p;
+  if(argint(0, &pid) < 0)
+    return -1;
+
+  acquire(&ptable.lock);
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
+    if(p->pid == pid) {
+      release(&ptable.lock);
+      return ticks - p->creation_time;
+    }
+  }
+  release(&ptable.lock);
+  return -1; // Process not found
 }

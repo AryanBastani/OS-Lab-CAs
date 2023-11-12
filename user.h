@@ -24,6 +24,7 @@ char* sbrk(int);
 int sleep(int);
 int uptime(void);
 int get_uncle_count(int);
+int get_process_lifetime(int);
 
 // new system calls
 int find_digital_root(void);
