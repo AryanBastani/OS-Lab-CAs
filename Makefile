@@ -183,9 +183,9 @@ UPROGS=\
 	_wc\
 	_zombie\
 	_get_pid\
-	_test_root\
+	_find_digital_root\
 	_get_uncles_count\
-	_process_lifetime\
+	_get_process_lifetime\
 	_copy_file\
 
 fs.img: mkfs README $(UPROGS)
