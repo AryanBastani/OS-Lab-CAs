@@ -19,6 +19,8 @@ static void consputc(int);
 
 static int panicked = 0;
 
+static int distance = 0;
+
 static struct {
   struct spinlock lock;
   int locking;
@@ -126,7 +128,21 @@ panic(char *s)
 //PAGEBREAK: 50
 #define BACKSPACE 0x100
 #define CRTPORT 0x3d4
+#define CONTROL_B 0x101
+#define CONTROL_F 0x102
+#define CONTROL_L 0x103
+#define CONTROL_U 0x104
 static ushort *crt = (ushort*)P2V(0xb8000);  // CGA memory
+
+#define INPUT_BUF 128
+#define COMMAND_BUF 10
+struct {
+  char buf[INPUT_BUF];
+  uint r;  // Read index
+  uint w;  // Write index
+  uint e;  // Edit index
+  uint c; // Cursor index
+} input;
 
 static void
 cgaputc(int c)
@@ -138,13 +154,66 @@ cgaputc(int c)
   pos = inb(CRTPORT+1) << 8;
   outb(CRTPORT, 15);
   pos |= inb(CRTPORT+1);
+  
 
-  if(c == '\n')
+  if(c == '\n'){ 
+    pos += distance;
+    distance = 0;
+    input.c = input.e;
     pos += 80 - pos%80;
-  else if(c == BACKSPACE){
-    if(pos > 0) --pos;
-  } else
+  }
+    
+  else if(c == BACKSPACE || c == CONTROL_U){
+    if(c == CONTROL_U){
+      pos += distance;
+      distance = 0;
+    }
+    if(pos > 0){
+      if(distance > 0){
+          ushort per_elmnt, curr_elmnt = crt[pos + distance];
+          for(int i = pos + distance; i >= pos; i--){
+            per_elmnt = crt[i - 1];
+            crt[i - 1] = curr_elmnt;
+            curr_elmnt = per_elmnt;
+          }
+      }
+      pos--;
+    }
+  } 
+  else if(c == CONTROL_B && pos > 0 &&
+    input.buf[(input.c-1) % INPUT_BUF] != '\n'){
+        if(input.c != input.w){
+          input.c--;
+          pos--;
+          distance++;
+        }
+  }
+  else if(c == CONTROL_F){
+    input.c++;
+    pos++;
+    distance--;
+  }
+  else if(c == CONTROL_L){
+    pos += distance;
+    distance = 0;
+    while(pos > 0)
+      crt[pos--] = ' ' | 0x0700;
+    crt[0] = '$' | 0x0700;
+    crt[1] = ' ' | 0x0700;
+    pos = 2;
+  }
+  else{
+    if(distance > 0){
+      ushort next_elmnt, curr_elmnt = crt[pos];
+        for(int i = pos; i <= pos + distance; i++){
+          next_elmnt = crt[i + 1];
+          crt[i + 1] = curr_elmnt;
+          curr_elmnt = next_elmnt;
+        }
+    }
     crt[pos++] = (c&0xff) | 0x0700;  // black on white
+  }
+ 
 
   if(pos < 0 || pos > 25*80)
     panic("pos under/overflow");
@@ -159,7 +228,12 @@ cgaputc(int c)
   outb(CRTPORT+1, pos>>8);
   outb(CRTPORT, 15);
   outb(CRTPORT+1, pos);
-  crt[pos] = ' ' | 0x0700;
+
+
+  if((c != CONTROL_B && c != CONTROL_F) && distance == 0)
+    crt[pos] = ' ' | 0x0700;
+  else if(c != CONTROL_B && distance > 0)
+    crt[pos + distance] = ' ' | 0x0700;
 }
 
 void
@@ -171,20 +245,16 @@ consputc(int c)
       ;
   }
 
-  if(c == BACKSPACE){
+  if(c == BACKSPACE || c == CONTROL_U){
     uartputc('\b'); uartputc(' '); uartputc('\b');
   } else
-    uartputc(c);
+    uartputc(c);   
   cgaputc(c);
 }
 
-#define INPUT_BUF 128
-struct {
-  char buf[INPUT_BUF];
-  uint r;  // Read index
-  uint w;  // Write index
-  uint e;  // Edit index
-} input;
+char cmds[COMMAND_BUF][INPUT_BUF];
+int cmd_idx = 0;
+int cmd_pointer = 0;
 
 #define C(x)  ((x)-'@')  // Control-x
 
@@ -192,7 +262,7 @@ void
 consoleintr(int (*getc)(void))
 {
   int c, doprocdump = 0;
-
+  int i, n, j;
   acquire(&cons.lock);
   while((c = getc()) >= 0){
     switch(c){
@@ -201,27 +271,124 @@ consoleintr(int (*getc)(void))
       doprocdump = 1;
       break;
     case C('U'):  // Kill line.
+      input.c = input.e;
       while(input.e != input.w &&
             input.buf[(input.e-1) % INPUT_BUF] != '\n'){
         input.e--;
-        consputc(BACKSPACE);
+        input.c--;
+        consputc(CONTROL_U);
       }
       break;
     case C('H'): case '\x7f':  // Backspace
-      if(input.e != input.w){
+      if(input.c != input.w && input.buf[(input.c-1) % INPUT_BUF] != '\n'){
+        if(input.c != input.e){
+          ushort per_elmnt, curr_elmnt = input.buf[input.e % INPUT_BUF];
+          for(int i = input.e; i >= input.c; i--){
+            per_elmnt = input.buf[(i - 1) % INPUT_BUF];
+            input.buf[(i - 1) % INPUT_BUF] = curr_elmnt;
+            curr_elmnt = per_elmnt;
+          }
+        }
+        input.c--;
         input.e--;
         consputc(BACKSPACE);
       }
       break;
+    case C('L'):
+      memset(input.buf, 0, 128);
+      input.e = input.w;
+      input.c = input.e;
+      cgaputc(CONTROL_L);
+      break;
+    case C('B'):
+      if(input.c != input.w &&
+            input.buf[(input.c-1) % INPUT_BUF] != '\n'){
+              consputc(CONTROL_B);
+            }
+      break;
+    case C('F'):
+      if(input.c != input.e &&
+        input.buf[(input.e + 1) % INPUT_BUF] != '\n'){
+              consputc(CONTROL_F);
+            }
+      break;
+    case 0xE2: // UP key
+      if(cmd_pointer > 0){
+        cmd_pointer--;
+        while(input.e != input.w && input.buf[(input.e-1) % INPUT_BUF] != '\n'){
+          input.e--;
+          input.c--;
+          consputc(BACKSPACE);
+        }
+        input.w = input.e;
+        for(i = 0; cmds[cmd_pointer][i] != '\0'; i++){
+          input.buf[(input.e) % INPUT_BUF] = cmds[cmd_pointer][i];
+          consputc(cmds[cmd_pointer][i] & 0xff);
+          input.e++;
+          input.c++;
+        }
+      }
+    break;
+    case 0xE3: // DOWN key
+      if(cmd_pointer != cmd_idx){
+        cmd_pointer++;
+        while(input.e != input.w && input.buf[(input.e-1) % INPUT_BUF] != '\n'){
+          input.e--;
+          input.c++;
+          consputc(BACKSPACE);
+        }
+        input.w = input.e;
+        for(i = 0; cmds[cmd_pointer][i] != '\0'; i++){
+          input.buf[(input.e) % INPUT_BUF] = cmds[cmd_pointer][i];
+          consputc(cmds[cmd_pointer][i] & 0xff);
+          input.e++;
+          input.c++;
+        }
+      }
+    break;
     default:
       if(c != 0 && input.e-input.r < INPUT_BUF){
         c = (c == '\r') ? '\n' : c;
-        input.buf[input.e++ % INPUT_BUF] = c;
+        if(input.e == input.c || c == '\n'){
+          input.buf[input.e++ % INPUT_BUF] = c;
+          input.c++;
+        }
+        else{
+          ushort next_elmnt, curr_elmnt = input.buf[input.c % INPUT_BUF];
+          input.e++;
+          for(int i = input.c; i < input.e; i++){
+            next_elmnt = input.buf[(i + 1) % INPUT_BUF];
+            input.buf[(i + 1) % INPUT_BUF] = curr_elmnt;
+            curr_elmnt = next_elmnt;
+          }
+          input.buf[input.c++ % INPUT_BUF] = c;
+        }
+
         consputc(c);
         if(c == '\n' || c == C('D') || input.e == input.r+INPUT_BUF){
+          if(c == '\n'){
+            if(cmd_idx == COMMAND_BUF){  // clear all elements before shift all commands up
+              for(i = 0; i < COMMAND_BUF - 1; i++){
+                for(n = 0; n < INPUT_BUF; n++)
+                  cmds[i][n] = '\0';
+                for(j = 0; cmds[i + 1][j] != '\0'; j++)
+                  cmds[i][j] = cmds[i + 1][j];
+              }
+              for(n = 0; n < INPUT_BUF; n++)
+                cmds[COMMAND_BUF - 1][n] = '\0';
+              cmd_idx--;
+            }
+              
+            for(i = input.w; i < input.e - 1; i++)  // insert new command
+              cmds[cmd_idx][i - input.w] = input.buf[i % INPUT_BUF];
+            
+            cmd_idx = (cmd_idx == COMMAND_BUF)? COMMAND_BUF : cmd_idx + 1;
+            cmd_pointer = cmd_idx;
+          }
           input.w = input.e;
           wakeup(&input.r);
         }
+        // input.end++;
       }
       break;
     }
