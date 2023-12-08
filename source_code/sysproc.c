@@ -111,3 +111,16 @@ sys_get_process_lifetime(void)
 
   return(get_process_lifetime(pid));
 }
+
+int
+sys_change_scheduling_queue(void)
+{
+  int queue_number, pid;
+  if(argint(0, &pid) < 0 || argint(1, &queue_number) < 0)
+    return -1;
+
+  if(queue_number < ROUND_ROBIN || queue_number > BJF)
+    return -1;
+
+  return change_sched_queue(pid, queue_number);
+}

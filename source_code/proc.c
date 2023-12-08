@@ -572,3 +572,47 @@ int get_process_lifetime(int pid) {
   release(&ptable.lock);
   return -1; // Process not found
 }
+
+void
+ageprocs(int ticks)
+{
+  struct proc *p;
+  acquire(&ptable.lock);
+
+  for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+    if (p->state == RUNNABLE && p->sched_info.queue != ROUND_ROBIN)
+      if (ticks - p->sched_info.last_run > MAX_AGING_LIMIT)
+      {
+        release(&ptable.lock);
+        change_sched_queue(p->pid, ROUND_ROBIN);
+        acquire(&ptable.lock);
+      }
+    
+  release(&ptable.lock);
+}
+
+int
+change_sched_queue(int pid, int new_queue) {
+  struct proc *p;
+  int old_queue = -1;
+  if (new_queue == UNSET)
+  {
+    if (pid == 1)
+      new_queue = ROUND_ROBIN;
+    else if (pid > 1)
+      new_queue = LCFS;
+    else
+      return -1;
+  }
+  acquire(&ptable.lock);
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    if(p->pid == pid){
+      old_queue = p->sched_info.queue;
+      p->sched_info.queue = new_queue;
+      release(&ptable.lock);
+      return old_queue;
+    }
+  }
+  release(&ptable.lock);
+  return old_queue;
+}
