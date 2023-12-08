@@ -573,8 +573,34 @@ int get_process_lifetime(int pid) {
   return -1; // Process not found
 }
 
+int
+change_sched_queue(int pid, int new_queue) {
+  struct proc *p;
+  if (new_queue == UNSET)
+  {
+    if (pid == 1)
+      new_queue = ROUND_ROBIN;
+    else if (pid > 1)
+      new_queue = LCFS;
+    else
+      return -1;
+  }
+  int old_queue = -1;
+  acquire(&ptable.lock);
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    if(p->pid == pid){
+      old_queue = p->sched_info.queue;
+      p->sched_info.queue = new_queue;
+      release(&ptable.lock);
+      return old_queue;
+    }
+  }
+  release(&ptable.lock);
+  return old_queue;
+}
+
 void
-ageprocs(int ticks)
+handle_procs_age(int ticks)
 {
   struct proc *p;
   acquire(&ptable.lock);
@@ -591,28 +617,3 @@ ageprocs(int ticks)
   release(&ptable.lock);
 }
 
-int
-change_sched_queue(int pid, int new_queue) {
-  struct proc *p;
-  int old_queue = -1;
-  if (new_queue == UNSET)
-  {
-    if (pid == 1)
-      new_queue = ROUND_ROBIN;
-    else if (pid > 1)
-      new_queue = LCFS;
-    else
-      return -1;
-  }
-  acquire(&ptable.lock);
-  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-    if(p->pid == pid){
-      old_queue = p->sched_info.queue;
-      p->sched_info.queue = new_queue;
-      release(&ptable.lock);
-      return old_queue;
-    }
-  }
-  release(&ptable.lock);
-  return old_queue;
-}

@@ -124,7 +124,7 @@ void            wakeup(void*);
 void            yield(void);
 int             get_uncle_count(int pid);
 int             get_process_lifetime(int pid);
-void            ageprocs(int);
+void            handle_procs_age(int);
 int             change_sched_queue(int, int);
 
 // swtch.S

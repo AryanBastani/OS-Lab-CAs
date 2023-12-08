@@ -36,6 +36,8 @@ idtinit(void)
 void
 trap(struct trapframe *tf)
 {
+  int all_ticks;
+
   if(tf->trapno == T_SYSCALL){
     if(myproc()->killed)
       exit();
@@ -51,8 +53,10 @@ trap(struct trapframe *tf)
     if(cpuid() == 0){
       acquire(&tickslock);
       ticks++;
+      all_ticks = ticks;
       wakeup(&ticks);
       release(&tickslock);
+      handle_procs_age(all_ticks);
     }
     lapiceoi();
     break;
