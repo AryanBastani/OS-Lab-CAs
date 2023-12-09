@@ -332,7 +332,7 @@ struct proc*
 roundrobin(struct proc *last_sched_proc)
 {
   struct proc *p = last_sched_proc;
-  for (;;)
+  while (1)
   {
     p++;
     if (p >= &ptable.proc[NPROC])
@@ -345,7 +345,6 @@ roundrobin(struct proc *last_sched_proc)
       return 0;
   }
 }
-
 
 struct proc*
 lcfs(void)
@@ -365,7 +364,6 @@ lcfs(void)
   }
   return maxP;
 }
-
 
 static inline
 float
@@ -679,7 +677,7 @@ change_sched_queue(int pid, int new_queue) {
   {
     if (pid == 1)
       new_queue = ROUND_ROBIN;
-    else if (pid > 1) // TODO correct this
+    else if (pid > 1)
       new_queue = LCFS;
     else
       return -1;
@@ -690,9 +688,6 @@ change_sched_queue(int pid, int new_queue) {
     if(p->pid == pid){
       old_queue = p->sched_info.queue;
       p->sched_info.queue = new_queue;
-      // if (new_queue == LOTTERY && p->sched_info.tickets_count <= 0) {
-      //   p->sched_info.tickets_count = (rand() % MAX_RANDOM_TICKETS) + 1;
-      // }
       break;
     }
   }
@@ -731,7 +726,6 @@ set_proc_bjf_params(int pid, float priority_ratio, float arrival_time_ratio,
       p->sched_info.bjf.arrival_time_ratio = arrival_time_ratio;
       p->sched_info.bjf.executed_cycle_ratio = executed_cycles_ratio;
       p->sched_info.bjf.process_size_ratio = process_size_ratio;
-      // release(&ptable.lock);
       found = 0;
       break;
     }
