@@ -112,6 +112,13 @@ found:
   memset(p->context, 0, sizeof *p->context);
   p->context->eip = (uint)forkret;
 
+  memset(&p->sched_info, 0, sizeof(p->sched_info));
+  p->sched_info.queue = UNSET;
+  p->sched_info.bjf.priority = BJF_PRIORITY;
+  p->sched_info.bjf.priority_ratio = 1;
+  p->sched_info.bjf.arrival_time_ratio = 1;
+  p->sched_info.bjf.executed_cycle_ratio = 1;
+
   return p;
 }
 
@@ -151,6 +158,7 @@ userinit(void)
   p->state = RUNNABLE;
 
   release(&ptable.lock);
+  change_sched_queue(p->pid, UNSET);
 }
 
 // Grow current process's memory by n bytes.
@@ -218,7 +226,13 @@ fork(void)
   
   np->creation_time = ticks;
 
+  acquire(&tickslock);
+  np->sched_info.last_run = ticks;
+  np->sched_info.bjf.arrival_time = ticks;
+  release(&tickslock);
+
   release(&ptable.lock);
+  change_sched_queue(np->pid, UNSET);
 
   return pid;
 }
@@ -313,6 +327,52 @@ wait(void)
   }
 }
 
+struct proc*
+roundrobin(struct proc *last_sched_proc)
+{
+  struct proc *p = last_sched_proc;
+  for (;;)
+  {
+    p++;
+    if (p >= &ptable.proc[NPROC])
+      p = ptable.proc;
+
+    if (p->state == RUNNABLE && p->sched_info.queue == ROUND_ROBIN)
+      return p;
+
+    if (p == last_sched_proc)
+      return 0;
+  }
+}
+
+static float
+calc_bjf_rank(struct proc* p)
+{
+  return p->sched_info.bjf.priority * p->sched_info.bjf.priority_ratio +
+         p->sched_info.bjf.arrival_time * p->sched_info.bjf.arrival_time_ratio +
+         p->sched_info.bjf.executed_cycle * p->sched_info.bjf.executed_cycle_ratio;
+}
+
+struct proc*
+bestjobfirst(void)
+{
+  struct proc* res_p = 0;
+  struct proc* p;
+  float minrank, rank;
+
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    if(p->state != RUNNABLE || p->sched_info.queue != BJF)
+      continue;
+    rank = calc_bjf_rank(p);
+    if(res_p == 0 || rank < minrank){
+      res_p = p;
+      minrank = rank;
+    }
+  }
+
+  return res_p;
+}
+
 //PAGEBREAK: 42
 // Per-CPU process scheduler.
 // Each CPU calls scheduler() after setting itself up.
@@ -325,6 +385,7 @@ void
 scheduler(void)
 {
   struct proc *p;
+  struct proc *last_round_robin = &ptable.proc[NPROC - 1];
   struct cpu *c = mycpu();
   c->proc = 0;
   
@@ -334,24 +395,42 @@ scheduler(void)
 
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
-    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-      if(p->state != RUNNABLE)
-        continue;
 
-      // Switch to chosen process.  It is the process's job
-      // to release ptable.lock and then reacquire it
-      // before jumping back to us.
-      c->proc = p;
-      switchuvm(p);
-      p->state = RUNNING;
-
-      swtch(&(c->scheduler), p->context);
-      switchkvm();
-
-      // Process is done running for now.
-      // It should have changed its p->state before coming back.
-      c->proc = 0;
+    p = roundrobin(last_round_robin);
+    if(p)
+      last_round_robin = p;
+    
+    else{
+      // p = lottery(); // TODO LCFS
+      // if(!p){
+        p = bestjobfirst();
+        if(!p){
+          release(&ptable.lock);
+          continue;
+        }
+      // }
     }
+
+
+
+    // Switch to chosen process.  It is the process's job
+    // to release ptable.lock and then reacquire it
+    // before jumping back to us.
+    c->proc = p;
+    switchuvm(p);
+    p->state = RUNNING;
+
+
+    p->sched_info.last_run = ticks;
+    p->sched_info.bjf.executed_cycle += 0.1f;
+
+
+    swtch(&(c->scheduler), p->context);
+    switchkvm();
+
+    // Process is done running for now.
+    // It should have changed its p->state before coming back.
+    c->proc = 0;
     release(&ptable.lock);
 
   }
@@ -578,12 +657,12 @@ change_sched_queue(int pid, int new_queue) {
   struct proc *p;
   if (new_queue == UNSET)
   {
-    if (pid == 1)
+    // if (pid == 1)
       new_queue = ROUND_ROBIN;
-    else if (pid > 1)
-      new_queue = LCFS;
-    else
-      return -1;
+    // else if (pid > 1) // TODO correct this
+      // new_queue = LCFS;
+    // else
+      // return -1;
   }
   int old_queue = -1;
   acquire(&ptable.lock);
@@ -591,8 +670,10 @@ change_sched_queue(int pid, int new_queue) {
     if(p->pid == pid){
       old_queue = p->sched_info.queue;
       p->sched_info.queue = new_queue;
-      release(&ptable.lock);
-      return old_queue;
+      // if (new_queue == LOTTERY && p->sched_info.tickets_count <= 0) {
+      //   p->sched_info.tickets_count = (rand() % MAX_RANDOM_TICKETS) + 1;
+      // }
+      break;
     }
   }
   release(&ptable.lock);

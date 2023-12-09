@@ -38,6 +38,7 @@ struct context {
 
 enum schedulequeue { UNSET, ROUND_ROBIN, LCFS, BJF };
 #define MAX_AGING_LIMIT 8000
+#define BJF_PRIORITY 3
 
 struct bjfinfo {
   int priority;
@@ -49,7 +50,7 @@ struct bjfinfo {
 };
 
 struct scheduleinfo {
-  enum schedulequeue queue; // Process queue
+  enum schedulequeue queue; // Process's queue
   struct bjfinfo bjf;       // BJF scheduling information
   int last_run;             // Last time process was running
 };
