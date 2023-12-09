@@ -189,6 +189,7 @@ UPROGS=\
 	_get_process_lifetime\
 	_copy_file\
 	_test_sched\
+	_foo\
 
 fs.img: mkfs README strdiff_result.txt $(UPROGS)
 	./mkfs fs.img README strdiff_result.txt $(UPROGS)
@@ -258,7 +259,7 @@ qemu-nox-gdb: fs.img xv6.img .gdbinit
 EXTRA=\
 	mkfs.c ulib.c user.h cat.c echo.c forktest.c grep.c kill.c\
 	ln.c ls.c mkdir.c rm.c stressfs.c usertests.c wc.c zombie.c\
-	printf.c umalloc.c strdiff.c test_root.c test_sched.c\
+	printf.c umalloc.c strdiff.c test_root.c test_sched.c foo.c\
 	README strdiff_result.txt dot-bochsrc *.pl toc.* runoff runoff1\
 	runoff.list\
 	.gdbinit.tmpl gdbutil\
