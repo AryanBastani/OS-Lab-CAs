@@ -124,3 +124,39 @@ sys_change_scheduling_queue(void)
 
   return change_sched_queue(pid, queue_number);
 }
+
+int
+sys_set_proc_bjf_params(void)
+{
+  int pid;
+  float priority_ratio, arrival_time_ratio, executed_cycle_ratio, process_size_ratio;
+  if(argint(0, &pid) < 0 || argfloat(1, &priority_ratio) < 0 ||
+     argfloat(2, &arrival_time_ratio) < 0 || argfloat(3, &executed_cycle_ratio) < 0 ||
+     argfloat(4, &process_size_ratio)){
+    return -1;
+  }
+
+  return set_proc_bjf_params(pid, priority_ratio, arrival_time_ratio, executed_cycle_ratio, process_size_ratio);
+}
+
+int
+sys_set_global_bjf_params(void)
+{
+  int pid;
+  float priority_ratio, arrival_time_ratio, executed_cycle_ratio, process_size_ratio;
+  if(argint(0, &pid) < 0 || argfloat(1, &priority_ratio) < 0 ||
+     argfloat(2, &arrival_time_ratio) < 0 || argfloat(3, &executed_cycle_ratio) < 0 ||
+     argfloat(4, &process_size_ratio)){
+    return -1;
+  }
+
+  set_global_bjf_params(priority_ratio, arrival_time_ratio, executed_cycle_ratio, process_size_ratio);
+  return 0;
+}
+
+int
+sys_show_procs_info(void)
+{
+  show_procs_info();
+  return 0;
+}

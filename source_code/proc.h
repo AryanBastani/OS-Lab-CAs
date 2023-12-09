@@ -47,6 +47,8 @@ struct bjfinfo {
   float arrival_time_ratio;
   float executed_cycle;
   float executed_cycle_ratio;
+  int process_size;
+  float process_size_ratio;
 };
 
 struct scheduleinfo {

@@ -25,3 +25,6 @@
 #define SYS_get_process_lifetime 24
 #define SYS_copy_file 25
 #define SYS_change_scheduling_queue 26
+#define SYS_set_proc_bjf_params 27
+#define SYS_set_global_bjf_params 28
+#define SYS_show_procs_info 29

@@ -126,6 +126,9 @@ int             get_uncle_count(int pid);
 int             get_process_lifetime(int pid);
 void            handle_procs_age(int);
 int             change_sched_queue(int, int);
+int             set_proc_bjf_params(int, float, float, float, float);
+void            set_global_bjf_params(float, float, float, float);
+void            show_procs_info(void);
 
 // swtch.S
 void            swtch(struct context**, struct context*);
@@ -158,8 +161,10 @@ char*           strncpy(char*, const char*, int);
 int             argint(int, int*);
 int             argptr(int, char**, int);
 int             argstr(int, char**);
+int             argfloat(int, float*);
 int             fetchint(uint, int*);
 int             fetchstr(uint, char**);
+int             fetchfloat(uint, float*);
 void            syscall(void);
 
 // timer.c

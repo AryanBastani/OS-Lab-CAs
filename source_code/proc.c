@@ -113,6 +113,7 @@ found:
   p->context->eip = (uint)forkret;
 
   memset(&p->sched_info, 0, sizeof(p->sched_info));
+  p->creation_time = ticks;
   p->sched_info.queue = UNSET;
   p->sched_info.bjf.priority = BJF_PRIORITY;
   p->sched_info.bjf.priority_ratio = 1;
@@ -345,12 +346,35 @@ roundrobin(struct proc *last_sched_proc)
   }
 }
 
-static float
+
+struct proc*
+lcfs(void)
+{
+  struct proc *maxP = 0;
+  struct proc* p;
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    if(p->state != RUNNABLE || p->sched_info.queue != LCFS)
+      continue;
+      
+    if (maxP!=0){
+      if(p->creation_time > maxP->creation_time)
+        maxP = p;
+    }
+    else
+      maxP = p;
+  }
+  return maxP;
+}
+
+
+static inline
+float
 calc_bjf_rank(struct proc* p)
 {
   return p->sched_info.bjf.priority * p->sched_info.bjf.priority_ratio +
          p->sched_info.bjf.arrival_time * p->sched_info.bjf.arrival_time_ratio +
-         p->sched_info.bjf.executed_cycle * p->sched_info.bjf.executed_cycle_ratio;
+         p->sched_info.bjf.executed_cycle * p->sched_info.bjf.executed_cycle_ratio + 
+         p->sched_info.bjf.process_size * p->sched_info.bjf.process_size_ratio;
 }
 
 struct proc*
@@ -401,25 +425,21 @@ scheduler(void)
       last_round_robin = p;
     
     else{
-      // p = lottery(); // TODO LCFS
-      // if(!p){
+      p = lcfs(); // TODO LCFS
+      if(!p){
         p = bestjobfirst();
         if(!p){
           release(&ptable.lock);
           continue;
         }
-      // }
+      }
     }
-
-
-
     // Switch to chosen process.  It is the process's job
     // to release ptable.lock and then reacquire it
     // before jumping back to us.
     c->proc = p;
     switchuvm(p);
     p->state = RUNNING;
-
 
     p->sched_info.last_run = ticks;
     p->sched_info.bjf.executed_cycle += 0.1f;
@@ -657,12 +677,12 @@ change_sched_queue(int pid, int new_queue) {
   struct proc *p;
   if (new_queue == UNSET)
   {
-    // if (pid == 1)
+    if (pid == 1)
       new_queue = ROUND_ROBIN;
-    // else if (pid > 1) // TODO correct this
-      // new_queue = LCFS;
-    // else
-      // return -1;
+    else if (pid > 1) // TODO correct this
+      new_queue = LCFS;
+    else
+      return -1;
   }
   int old_queue = -1;
   acquire(&ptable.lock);
@@ -698,3 +718,124 @@ handle_procs_age(int ticks)
   release(&ptable.lock);
 }
 
+int
+set_proc_bjf_params(int pid, float priority_ratio, float arrival_time_ratio,
+                  float executed_cycles_ratio, float process_size_ratio)
+{
+  acquire(&ptable.lock);
+  struct proc* p;
+  int found = -1;
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    if(p->pid == pid){
+      p->sched_info.bjf.priority_ratio = priority_ratio;
+      p->sched_info.bjf.arrival_time_ratio = arrival_time_ratio;
+      p->sched_info.bjf.executed_cycle_ratio = executed_cycles_ratio;
+      p->sched_info.bjf.process_size_ratio = process_size_ratio;
+      // release(&ptable.lock);
+      found = 0;
+      break;
+    }
+  }
+  release(&ptable.lock);
+  return found;
+}
+
+void
+set_global_bjf_params(float priority_ratio, float arrival_time_ratio,
+                    float executed_cycles_ratio, float process_size_ratio)
+{
+  acquire(&ptable.lock);
+  struct proc* p;
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    p->sched_info.bjf.priority_ratio = priority_ratio;
+    p->sched_info.bjf.arrival_time_ratio = arrival_time_ratio;
+    p->sched_info.bjf.executed_cycle_ratio = executed_cycles_ratio;
+    p->sched_info.bjf.process_size_ratio = process_size_ratio;
+  }
+  release(&ptable.lock);
+}
+
+static inline
+int
+digitcount(int num)
+{
+  int count = 1;
+  while(num){
+    num /= 10;
+    ++count;
+  }
+  return count;
+}
+
+static inline
+void
+printspaces(int count)
+{
+  for(int i = 0; i < count; ++i)
+    cprintf(" ");
+}
+
+void
+show_procs_info()
+{
+ static char *states[] = {
+  [RUNNABLE]  "runnable",
+  [RUNNING]   "running",
+  [EMBRYO]    "embryo",
+  [UNUSED]    "unused",
+  [SLEEPING]  "sleeping",
+  [ZOMBIE]    "zombie"
+  };
+
+  static int columns[] = {16, 8, 9, 8, 8, 8, 8, 9, 8, 8, 8, 8};
+  cprintf("Process_Name    PID     State    Queue   Cycle   Arrival  Priority R_Prty  R_Arvl  R_Exec R_Size Rank\n"
+          "------------------------------------------------------------------------------------------------------\n");
+
+  struct proc *p;
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    if(p->state == UNUSED)
+      continue;
+
+    const char* state;
+    if(p->state >= 0 && p->state < NELEM(states) && states[p->state])
+      state = states[p->state];
+    else
+      state = "???";
+
+    cprintf("%s", p->name);
+    printspaces(columns[0] - strlen(p->name));
+
+    cprintf("%d", p->pid);
+    printspaces(columns[1] - digitcount(p->pid));
+
+    cprintf("%s", state);
+    printspaces(columns[2] - strlen(state));
+
+    cprintf("%d", p->sched_info.queue);
+    printspaces(columns[3] - digitcount(p->sched_info.queue));
+
+    cprintf("%d", (int)p->sched_info.bjf.executed_cycle);
+    printspaces(columns[4] - digitcount((int)p->sched_info.bjf.executed_cycle));
+
+    cprintf("%d", p->sched_info.bjf.arrival_time);
+    printspaces(columns[5] - digitcount(p->sched_info.bjf.arrival_time));
+
+    cprintf("%d", p->sched_info.bjf.priority);
+    printspaces(columns[7] - digitcount(p->sched_info.bjf.priority));
+
+    cprintf("%d", (int)p->sched_info.bjf.priority_ratio);
+    printspaces(columns[8] - digitcount((int)p->sched_info.bjf.priority_ratio));
+
+    cprintf("%d", (int)p->sched_info.bjf.arrival_time_ratio);
+    printspaces(columns[9] - digitcount((int)p->sched_info.bjf.arrival_time_ratio));
+
+    cprintf("%d", (int)p->sched_info.bjf.executed_cycle_ratio);
+    printspaces(columns[10] - digitcount((int)p->sched_info.bjf.executed_cycle_ratio));
+
+    cprintf("%d", (int)p->sched_info.bjf.process_size_ratio);
+    printspaces(columns[11] - digitcount((int)p->sched_info.bjf.process_size_ratio));
+
+    cprintf("%d", (int)calc_bjf_rank(p));
+    cprintf("\n");
+  }
+}

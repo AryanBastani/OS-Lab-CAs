@@ -23,12 +23,16 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
-int get_uncle_count(int);
-int get_process_lifetime(int);
-int copy_file(char* src, char* dst);
 
 // new system calls
 int find_digital_root(void);
+int get_uncle_count(int);
+int get_process_lifetime(int);
+int copy_file(char* src, char* dst);
+int change_scheduling_queue(int, int);
+int set_proc_bjf_params(int, float, float, float, float);
+void set_global_bjf_params(float, float, float, float);
+void show_procs_info(void);
 
 // ulib.c
 int stat(const char*, struct stat*);
