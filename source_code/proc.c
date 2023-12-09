@@ -423,7 +423,7 @@ scheduler(void)
       last_round_robin = p;
     
     else{
-      p = lcfs(); // TODO LCFS
+      p = lcfs();
       if(!p){
         p = bestjobfirst();
         if(!p){
