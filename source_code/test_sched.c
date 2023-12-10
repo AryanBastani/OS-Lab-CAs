@@ -1,8 +1,7 @@
 #include "types.h"
 #include "user.h"
 
-inline static void help();
-inline static void info();
+inline static void show_info();
 inline static void set_queue(int pid, int new_queue);
 
 inline static void set_proc_bjf(int pid, int priority_ratio, int arrival_time_ratio,
@@ -15,16 +14,14 @@ int main(int argc, char *argv[])
 {
   if (argc < 2)
   {
-    help();
     exit();
   }
-  if (!strcmp(argv[1], "info"))
-    info();
+  if (!strcmp(argv[1], "show_info"))
+    show_info();
   else if (!strcmp(argv[1], "set_queue"))
   {
     if (argc < 4)
     {
-      help();
       exit();
     }
     set_queue(atoi(argv[2]), atoi(argv[3]));
@@ -33,7 +30,6 @@ int main(int argc, char *argv[])
   {
     if (argc < 6)
     {
-      help();
       exit();
     }
     set_proc_bjf(atoi(argv[2]), atoi(argv[3]), atoi(argv[4]), atoi(argv[5]), atoi(argv[6]));
@@ -42,28 +38,15 @@ int main(int argc, char *argv[])
   {
     if (argc < 6)
     {
-      help();
       exit();
     }
     set_global_bjf(atoi(argv[2]), atoi(argv[3]), atoi(argv[4]), atoi(argv[5]));
   }
-  else
-    help();
 
   exit();
 }
 
-inline static void help()
-{
-  printf(1, "usage: test_sched <command> <arg1> <arg2>...\n");
-  printf(1, "Commands and Arguments: [\n");
-  printf(1, "  info\n");
-  printf(1, "  set_queue <pid> <new_queue>\n");
-  printf(1, "  set_proc_bjf <pid> <priority_ratio> <arrival_time_ratio> <executed_cycle_ratio> <process_size_ratio>\n");
-  printf(1, "  set_global_bjf <priority_ratio> <arrival_time_ratio> <executed_cycle_ratio> <process_size_ratio>\n]\n");
-}
-
-inline static void info()
+inline static void show_info()
 {
   show_procs_info();
 }
@@ -84,7 +67,7 @@ inline static void set_queue(int pid, int new_queue)
   if (res < 0)
     printf(1, "ERROR: changing queue failed\n");
   else
-    printf(1, "Queue changed successfully\n");
+    printf(1, "Process queue changed successfully\n");
 }
 
 inline static void set_proc_bjf(int pid, int priority_ratio, int arrival_time_ratio,
