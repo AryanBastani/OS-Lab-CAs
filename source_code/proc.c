@@ -115,7 +115,7 @@ found:
   memset(&p->sched_info, 0, sizeof(p->sched_info));
   p->creation_time = ticks;
   p->sched_info.queue = UNSET;
-  p->sched_info.bjf.priority = BJF_PRIORITY;
+  p->sched_info.bjf.priority = 3;
   p->sched_info.bjf.priority_ratio = 1;
   p->sched_info.bjf.arrival_time_ratio = 1;
   p->sched_info.bjf.executed_cycle_ratio = 1;
