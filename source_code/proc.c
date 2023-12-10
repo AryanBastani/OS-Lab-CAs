@@ -119,6 +119,8 @@ found:
   p->sched_info.bjf.priority_ratio = 1;
   p->sched_info.bjf.arrival_time_ratio = 1;
   p->sched_info.bjf.executed_cycle_ratio = 1;
+  p->sched_info.bjf.process_size = 1;
+  p->sched_info.bjf.process_size_ratio = 1;
 
   return p;
 }
